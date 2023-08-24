@@ -1,0 +1,48 @@
+syntax = "proto3";
+package protocol;
+
+option go_package = "./protocol";
+
+
+message Empty {}
+message ConfigResponse {
+    bool success = 1;
+    bytes data = 2;
+}
+message InTypes {
+    int32 index = 1;
+    bytes in = 2;
+    string type =3;
+}
+
+message OutType {
+    int32 index = 1;
+    bytes out = 2;
+    string type =3;
+}
+message FunctionRequest {
+    repeated InTypes in = 1;
+    string function = 2;
+    string struct = 3;
+}
+message ErrorMessage {
+    int32 code = 1;
+    string message = 2;
+    bytes data = 3;
+}
+message StatResponse {
+    int32 avgresponse = 1;
+}
+message FunctionResponse {
+    
+    bytes data = 1;
+    bool success = 2;
+    string client = 3;
+    optional ErrorMessage error=4;
+}
+service PluginProtocol {
+    rpc RequestConfig(Empty) returns (ConfigResponse) {}
+    rpc CallFunction (FunctionRequest) returns (FunctionResponse) {}
+    rpc HeartBeat (Empty) returns(Empty) {}
+    rpc Stat (Empty) returns(StatResponse) {}
+  }

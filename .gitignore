@@ -1,0 +1,7 @@
+*/*.log
+example/bin
+example/logs
+example/log
+logs/
+bin/
+_*/
