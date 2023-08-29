@@ -286,17 +286,21 @@ func (pm *PluginManager) CallFunction(pluginName string, strucName string, funct
 		if strings.EqualFold(plg.name, pluginName) {
 			fmt.Println("Plugin found", pluginName, strucName, function)
 			if !pm.Plugins[i].Connected() {
-				return nil, yaperror.Error(yaperror.NOT_CONNECTED, nil, yaperror.WithExra(map[string]interface{}{
+				err := yaperror.Error(yaperror.NOT_CONNECTED, nil, yaperror.WithExra(map[string]interface{}{
 					"plugin":   pluginName,
 					"struct":   strucName,
 					"function": function,
 					"params":   args,
 					"status":   pm.Plugins[i].ClientStatus(),
 				}))
+				pm.logger.Error("plugin not found", zap.Error(err))
+				return nil, err
 			}
-			fmt.Println("Plugin connected and send call", pluginName, strucName, function)
+			pm.GetPluginLogger(pluginName).Info("Plugin connected and send call", zap.Any("pluginName", pluginName), zap.Any("args", args), zap.Any("strucName", strucName), zap.Any("function", function))
+
 			response, err := pm.Plugins[i].Call(strucName, function, args)
-			fmt.Println("Plugin response", response, err, pluginName, strucName, function)
+			pm.GetPluginLogger(pluginName).Info("Plugin connected and send call", zap.Any("err", err), zap.Any("response", response), zap.Any("pluginName", pluginName), zap.Any("args", args), zap.Any("strucName", strucName), zap.Any("function", function))
+
 			return response, err
 
 		}

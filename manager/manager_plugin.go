@@ -375,7 +375,7 @@ func (p *Plugin) Serve() error {
 	if err != nil {
 		p.GetLogger().Fatal("cant create a protocol server", zap.Error(err), zap.String("sokcet_uri", p.socket), zap.String("name", p.Name()))
 	}
-	fmt.Println(p.Socket())
+
 	p.server.ConfigFunction = p.GenConfig
 	return p.server.Run()
 }
