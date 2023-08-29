@@ -98,7 +98,11 @@ func (e *YAPSError) Error() string {
 		extras = append(extras, fmt.Sprintf("%s: %v", key, val))
 	}
 	extraText := strings.Join(extras, ", ")
-	return fmt.Sprintf("ErroCode : %d, Message: %s, Wrapped Error: %v %s", e.Code, e.Code.String(), e.Err, extraText)
+	var errText string
+	if e.Err != nil {
+		errText = fmt.Sprintf("Wrapped Error: %v", e.Err)
+	}
+	return fmt.Sprintf("ErroCode : %d, Message: %s, %s %s", e.Code, e.Code.String(), errText, extraText)
 }
 
 type ErrorOptions struct {

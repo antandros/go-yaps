@@ -188,16 +188,13 @@ func (p *Plugin) ValidateStruct(item map[string]interface{}, function string, ar
 func (p *Plugin) ValidateFunction(structName string, function string, args []interface{}) (bool, error) {
 	itemName := p.StructMap["Item"].(map[string]interface{})
 	if strings.EqualFold(itemName["Name"].(string), structName) {
-		fmt.Println("structName", structName)
 		enErr := p.ValidateStruct(itemName, function, args)
 		if len(enErr) > 0 {
-			fmt.Println("enErr", enErr)
-			p.GetLogger().Error("validation error", zap.Error(yaperror.Error(yaperror.VALIDATE_ITEM, nil, yaperror.WithExra(map[string]interface{}{
-				"errors": enErr,
-			}))))
-			return false, yaperror.Error(yaperror.VALIDATE_ITEM, nil, yaperror.WithExra(map[string]interface{}{
+			err := yaperror.Error(yaperror.VALIDATE_ITEM, nil, yaperror.WithExra(map[string]interface{}{
 				"errors": enErr,
 			}))
+			p.GetLogger().Error("validation error", zap.Error(err))
+			return false, err
 		}
 		return true, nil
 	}
