@@ -61,7 +61,7 @@ func (p *Plugin) Call(structName string, function string, args []interface{}) (i
 	p.GetLogger().Info("Function call from plugin client", zap.String("struct", structName), zap.Any("args", args), zap.String("function", function))
 	isError, err := p.ValidateFunction(structName, function, args)
 	if !isError {
-		p.GetLogger().Error("Validation error", zap.Error(err), zap.Any("err_data", err), zap.String("struct", structName), zap.Any("args", args), zap.String("function", function))
+		p.GetLogger().Error("Validation error function", zap.Error(err), zap.Any("err_data", err), zap.String("struct", structName), zap.Any("args", args), zap.String("function", function))
 		return []interface{}{}, err
 	}
 	params := p.FunctionParamPop(structName, function, args)
@@ -193,7 +193,7 @@ func (p *Plugin) ValidateFunction(structName string, function string, args []int
 			err := yaperror.Error(yaperror.VALIDATE_ITEM, nil, yaperror.WithExra(map[string]interface{}{
 				"errors": enErr,
 			}))
-			p.GetLogger().Error("validation error", zap.Error(err), zap.Any("err_data", err))
+			p.GetLogger().Error("Validation error struct", zap.Error(err), zap.Any("err_data", err))
 			return false, err
 		}
 		return true, nil
@@ -202,19 +202,22 @@ func (p *Plugin) ValidateFunction(structName string, function string, args []int
 	for _, refIt := range refItems {
 		item := refIt.(map[string]interface{})
 		if strings.EqualFold(item["Name"].(string), structName) {
-			fmt.Println("structName", structName)
 			enErr := p.ValidateStruct(item, function, args)
 			if len(enErr) > 0 {
-				fmt.Println("enErr", enErr)
-				return false, yaperror.Error(yaperror.VALIDATE_ITEM, nil, yaperror.WithExra(map[string]interface{}{
+				err := yaperror.Error(yaperror.VALIDATE_ITEM, nil, yaperror.WithExra(map[string]interface{}{
 					"errors": enErr,
 				}))
+				p.GetLogger().Error("Valodation error related items", zap.Error(err))
+				return false, err
 			}
 			return true, nil
 		}
 	}
 
-	return false, nil
+	return false, yaperror.Error(yaperror.VALIDATE_ITEM, nil, yaperror.WithExra(map[string]interface{}{
+		"baseStruct": itemName,
+		"callStruct": structName,
+	}))
 }
 func (p *Plugin) Connected() bool {
 	if p.client == nil {
