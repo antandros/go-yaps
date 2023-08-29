@@ -58,11 +58,11 @@ func (p *Plugin) SetManager(manager *PluginManager) {
 }
 func (p *Plugin) Call(structName string, function string, args []interface{}) (interface{}, error) {
 
-	p.GetLogger().Info("Function call from plugin client", zap.String("struct", structName), zap.String("function", function))
+	p.GetLogger().Info("Function call from plugin client", zap.String("struct", structName), zap.Any("args", args), zap.String("function", function))
 	isError, err := p.ValidateFunction(structName, function, args)
 	if !isError {
-		p.GetLogger().Error("Validation error", zap.Error(err))
-		return nil, err
+		p.GetLogger().Error("Validation error", zap.Error(err), zap.String("struct", structName), zap.Any("args", args), zap.String("function", function))
+		return []interface{}{}, err
 	}
 	params := p.FunctionParamPop(structName, function, args)
 
