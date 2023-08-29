@@ -2,10 +2,17 @@ package plugin
 
 import (
 	"flag"
+	"fmt"
+	"runtime/debug"
 
 	"github.com/antandros/go-yaps/manager"
 )
 
+func Version() string {
+	info, _ := debug.ReadBuildInfo()
+
+	return fmt.Sprintf("-%s", info.GoVersion)
+}
 func RegisterPlugin(plg manager.PluginInterface, cnf *manager.PluginManagerConfig) {
 	var serverURI string
 	flag.StringVar(&serverURI, "server", "", "a string var")

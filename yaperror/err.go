@@ -67,6 +67,8 @@ func (y YapsError) String() string {
 		return "cant determinate a item type"
 	case CANT_PARSE_PLUGIN:
 		return "cant parse plugin"
+	case PLUGIN_BINARY_NOT_FOUND:
+		return "cant found plugin binary in binary folder"
 	}
 	return ""
 }
