@@ -61,7 +61,7 @@ func (p *Plugin) Call(structName string, function string, args []interface{}) (i
 	p.GetLogger().Info("Function call from plugin client", zap.String("struct", structName), zap.Any("args", args), zap.String("function", function))
 	isError, err := p.ValidateFunction(structName, function, args)
 	if !isError {
-		p.GetLogger().Error("Validation error", zap.Error(err), zap.String("struct", structName), zap.Any("args", args), zap.String("function", function))
+		p.GetLogger().Error("Validation error", zap.Error(err), zap.Any("err_data", err), zap.String("struct", structName), zap.Any("args", args), zap.String("function", function))
 		return []interface{}{}, err
 	}
 	params := p.FunctionParamPop(structName, function, args)
@@ -193,7 +193,7 @@ func (p *Plugin) ValidateFunction(structName string, function string, args []int
 			err := yaperror.Error(yaperror.VALIDATE_ITEM, nil, yaperror.WithExra(map[string]interface{}{
 				"errors": enErr,
 			}))
-			p.GetLogger().Error("validation error", zap.Error(err))
+			p.GetLogger().Error("validation error", zap.Error(err), zap.Any("err_data", err))
 			return false, err
 		}
 		return true, nil
