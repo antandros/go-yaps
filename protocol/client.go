@@ -119,14 +119,12 @@ func (cl *Client) Call(fncname string, strname string, params []InItem) (interfa
 		Struct:   strname,
 	}
 	var respItem interface{}
-	cl.logger.Info("function call", zap.String("function", fncname), zap.String("struct", strname), zap.Any("request", req))
 	resp, err := cl.client.CallFunction(cl.ctx, req)
 	if err != nil {
 		fmt.Println("Error", err)
 		return respItem, err
 	}
 	cl.responseTime = time.Since(t)
-	cl.logger.Info("function call response", zap.String("function", fncname), zap.String("struct", strname), zap.Any("response", resp))
 	json.Unmarshal(resp.GetData(), &respItem)
 
 	var errN error
