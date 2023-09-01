@@ -67,9 +67,7 @@ func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 var managerB *PluginManager
 
 func GetManager() (*PluginManager, error) {
-	fmt.Println("CALL MANAGER")
 	if managerB == nil {
-		fmt.Println("ERR REGISTER MANAGER")
 		return nil, errors.New("please register manager before call items")
 	}
 	return managerB, nil
