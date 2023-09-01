@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/antandros/go-yaps/example/plugins"
 	"github.com/antandros/go-yaps/manager"
 )
@@ -19,15 +17,6 @@ func main() {
 		panic(err)
 	}
 
-	item := plugins.NewTestItem()
-	fmt.Println(err)
-	fmt.Println(item.AddSlice("test"))
-	fmt.Println(item.AddSlice("test"))
-	fmt.Println(item.AddSlice("test"))
-	fmt.Println(item.AddSlice("test"))
-	item.AddSlice("test")
-	item.AddSlice("test")
-	fmt.Println(item.GetSlice())
-	fmt.Println(item.Name())
+	_ = plugins.NewTestItem()
 
 }

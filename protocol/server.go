@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net"
 
 	"go.uber.org/zap"
@@ -52,7 +51,6 @@ func (s Server) RequestConfig(ctx context.Context, req *Empty) (*ConfigResponse,
 
 		respData, err := json.Marshal(respFnc)
 		if err != nil {
-			fmt.Println("GetConfig error", err)
 			return nil, err
 		}
 		resp = &ConfigResponse{
@@ -80,7 +78,6 @@ func NewServer(ltype string, socket string, p PluginManagerInterface) (Server, e
 	if err != nil {
 		return Server{}, err
 	}
-	fmt.Println("ltype", socket, ltype)
 	handler := &Handler{
 		logger: p.GetLogger(),
 	}

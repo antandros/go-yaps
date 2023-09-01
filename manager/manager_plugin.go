@@ -221,7 +221,6 @@ func (p *Plugin) ValidateFunction(structName string, function string, args []int
 }
 func (p *Plugin) Connected() bool {
 	if p.client == nil {
-		fmt.Println("Client not init")
 		return false
 	}
 	return p.client.ConnectionStatus() == connectivity.Ready
@@ -289,8 +288,7 @@ func (p *Plugin) CreateProcess() error {
 	p.exec.Stdout = &p.execOut
 	p.exec.Stderr = &p.execErr
 	err = p.exec.Start()
-	fmt.Println("RUNERR", err)
-	fmt.Println(p.exec)
+
 	if err != nil {
 		return yaperror.Error(yaperror.RUN_BINARY, err, yaperror.WithExra(map[string]interface{}{
 			"output": p.execOut.String(),
@@ -321,13 +319,7 @@ func (p *Plugin) ConnectClient() {
 	p.client.WaitConnect()
 	data, err := p.client.GetConfig()
 	if err != nil {
-		fmt.Println("error", err)
-		fmt.Println("error", err)
-		fmt.Println("error", err)
-		fmt.Println("error", err)
-		fmt.Println("error", err)
-		fmt.Println("error", err)
-		fmt.Println("error", err)
+
 		fmt.Println("error", err)
 	}
 	p.configResponse = true

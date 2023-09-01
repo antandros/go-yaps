@@ -127,7 +127,6 @@ func (mt *Method) ParseParams(method reflect.Method) {
 		if inParamOrg.Kind() == reflect.Ptr {
 			inParamOrg = inParamOrg.Elem()
 		}
-		fmt.Println()
 		pr := &Param{
 			Obj:         inParam,
 			Type:        inParamOrg.Name(),
@@ -137,7 +136,6 @@ func (mt *Method) ParseParams(method reflect.Method) {
 			IsSlice:     isSlice,
 			Index:       i,
 		}
-		fmt.Println(pr)
 
 		mt.OutParams = append(mt.OutParams, pr)
 
@@ -267,7 +265,6 @@ func (si *StructItem) Parse(parser func(reflect.Type)) {
 	}
 	si.TypeName = outItem.Kind().String()
 	if si.TypeName == "" {
-		fmt.Println(outItem.String())
 	}
 	itemNew := reflect.New(outItem)
 	for m := 0; m < itemNew.NumMethod(); m++ {

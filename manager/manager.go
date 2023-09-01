@@ -176,17 +176,13 @@ func (pm *PluginManager) CreateBinary() error {
 	for _, plugin := range pm.Plugins {
 		cmdArgs := append([]string{}, "build")
 		binFile := path.Join(binPath, strings.ToLower(plugin.name))
-		fmt.Println(binFile)
 		cmdArgs = append(cmdArgs, "-o")
 		cmdArgs = append(cmdArgs, binFile)
 		cmdArgs = append(cmdArgs, fmt.Sprintf("%s.go", binFile))
 
 		build := exec.Command("go", cmdArgs...)
-		fmt.Println(cmdArgs)
 		build.Env = helper.ReplaceGoPath(os.Environ(), goPath)
-		output, err := build.CombinedOutput()
-		fmt.Println(string(output))
-		fmt.Println(output, err)
+		_, _ = build.CombinedOutput()
 	}
 
 	return nil
@@ -221,7 +217,6 @@ func (pm *PluginManager) CreateInterfaceFile(pname string, packagePath string, i
 		return err
 	}
 	tempName := path.Join(packagePath, fmt.Sprintf("%s.go", strings.ToLower(name)))
-	fmt.Println(tempName)
 	f, err := os.Create(tempName)
 	if err != nil {
 
@@ -249,7 +244,6 @@ func (pm *PluginManager) CreateInterfaces() error {
 	}
 	for _, plugin := range pm.Plugins {
 		item := plugin.StructData.Item
-		fmt.Println("item", item.Name)
 
 		pkgNameSlice := strings.Split(packagePath, "/")
 		pkgName := pkgNameSlice[len(pkgNameSlice)-1]
@@ -281,10 +275,8 @@ func (pm *PluginManager) CreateInterfaces() error {
 	return nil
 }
 func (pm *PluginManager) CallFunction(pluginName string, strucName string, function string, args []interface{}) (interface{}, error) {
-	fmt.Println("Call FNC", pluginName, strucName, function)
 	for i, plg := range pm.Plugins {
 		if strings.EqualFold(plg.name, pluginName) {
-			fmt.Println("Plugin found", pluginName, strucName, function)
 			if !pm.Plugins[i].Connected() {
 				err := yaperror.Error(yaperror.NOT_CONNECTED, nil, yaperror.WithExra(map[string]interface{}{
 					"plugin":   pluginName,

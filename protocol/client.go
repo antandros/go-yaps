@@ -52,7 +52,6 @@ func (c *Client) Connect() error {
 			}
 			return net.Dial("unix", addr)
 		}
-		fmt.Println("Addr :", addr, "Remote :", isRemote)
 		dd := grpc.WithContextDialer(dialer)
 		c.conn, err = grpc.Dial(addr, dd, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {

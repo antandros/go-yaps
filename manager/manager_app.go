@@ -15,7 +15,6 @@ import (
 )
 
 func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
-	fmt.Println(pconfig.File)
 	var plg Plugin
 	if !pconfig.Binary {
 		plg = Plugin{
@@ -53,8 +52,6 @@ func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 		for {
 			if strings.EqualFold(plg.ClientStatus(), "ready") {
 				break
-			} else {
-				fmt.Println(plg.ClientStatus())
 			}
 			time.Sleep(100 * time.Millisecond)
 		}
@@ -75,9 +72,7 @@ func GetManager() (*PluginManager, error) {
 func RegisterManager(cnf *PluginManagerConfig) *PluginManager {
 	grmon.Start()
 
-	fmt.Println("RegisterManager")
 	pth, err := os.MkdirTemp("", "pluginManager")
-	fmt.Println("TEMP", pth, err)
 	if err != nil {
 		panic(err)
 	}
@@ -99,14 +94,12 @@ func RegisterManager(cnf *PluginManagerConfig) *PluginManager {
 	_, pthErr := os.Stat(pthLog)
 	if pthErr != nil {
 		errMk := os.MkdirAll(pthLog, 0700)
-		fmt.Println("MkdirAll", pth, errMk)
 		if errMk != nil {
 			panic(errMk)
 		}
 	}
 
 	pId := fmt.Sprintf("%s.sokcet", manId)
-	fmt.Println("pId", pId, logger)
 
 	defer os.RemoveAll(pth)
 	socket := filepath.Join(pth, "manager", pId)
