@@ -288,10 +288,7 @@ func (pm *PluginManager) CallFunction(pluginName string, strucName string, funct
 				pm.logger.Error("plugin not found", zap.Error(err))
 				return nil, err
 			}
-			pm.GetPluginLogger(pluginName).Info("Plugin connected and send call", zap.Any("pluginName", pluginName), zap.Any("args", args), zap.Any("strucName", strucName), zap.Any("function", function))
-
 			response, err := pm.Plugins[i].Call(strucName, function, args)
-			pm.GetPluginLogger(pluginName).Info("Plugin connected and send call", zap.Any("err", err), zap.Any("response", response), zap.Any("pluginName", pluginName), zap.Any("args", args), zap.Any("strucName", strucName), zap.Any("function", function))
 			if response == nil {
 				return []interface{}{}, err
 			}
