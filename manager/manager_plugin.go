@@ -52,6 +52,9 @@ func (p *Plugin) KillProcess() {
 		p.process.Kill()
 	}
 }
+func (p *Plugin) GetProcess() (*os.Process, bytes.Buffer, bytes.Buffer) {
+	return p.process, p.execOut, p.execErr
+}
 func (p *Plugin) SetManager(manager *PluginManager) {
 
 	p.manager = manager
