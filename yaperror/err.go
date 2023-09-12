@@ -17,6 +17,8 @@ const (
 	CANT_PARSE_PLUGIN
 	PARSE_MESSAGE_BODY
 	NOT_CONNECTED
+	KILL_ERROR
+	DISCONNECT_CLIENT
 	PARSE_MESSAGE_NAME
 	PARSE_MESSAGE_GENERAL
 	PARSE_INVALID_ITEM_TYPE
@@ -41,10 +43,14 @@ func (y YapsError) String() string {
 		return "unknow error"
 	case RUN_BINARY:
 		return "can not run client binary"
+	case DISCONNECT_CLIENT:
+		return "cant disconnect client"
 	case VALIDATE_ITEM:
 		return "cant validate function call"
 	case NOT_CONNECTED:
 		return "plugin not connected"
+	case KILL_ERROR:
+		return "cant kill process"
 	case CONFIG_GET_ERROR:
 		return "plugin config response unsuccessfull"
 	case CANT_CALL:

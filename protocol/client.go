@@ -41,6 +41,9 @@ func (c *Client) ConnectionStatus() connectivity.State {
 	return state
 
 }
+func (c *Client) Disconnect() error {
+	return c.conn.Close()
+}
 func (c *Client) Connect() error {
 	if c.conn == nil {
 		addr := c.addr
