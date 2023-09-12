@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/antandros/go-yaps/helper"
 	"github.com/antandros/go-yaps/parser"
 	"github.com/antandros/go-yaps/protocol"
 	"github.com/antandros/go-yaps/yaperror"
@@ -282,16 +283,17 @@ func (p *Plugin) ProcessStatus() {
 	fmt.Println()
 }
 func (p *Plugin) loggerCmd() {
-	fileData, _ := os.OpenFile(fmt.Sprintf("cmd_log_%s.log", p.name), os.O_CREATE, os.ModeAppend)
+	flog := helper.LoggerNamed(fmt.Sprintf("cmd_%s", p.name))
 
 	for {
 		tmp := make([]byte, 1024)
 		_, err := p.execPipe.Read(tmp)
-		fileData.Write(tmp)
+		flog.Info(string(tmp))
 		if err != nil {
 			break
 		}
 	}
+
 }
 func (p *Plugin) CreateProcess() error {
 	if p.manager == nil {
