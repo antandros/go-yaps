@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path"
@@ -43,6 +44,7 @@ type Plugin struct {
 	manager    *PluginManager
 	process    *os.Process
 	exec       *exec.Cmd
+	execPipe   io.ReadCloser
 	StructData parser.Struct
 	StructMap  map[string]interface{}
 }
@@ -279,6 +281,18 @@ func (p *Plugin) ProcessStatus() {
 	fmt.Println()
 	fmt.Println()
 }
+func (p *Plugin) loggerCmd() {
+	fileData, _ := os.OpenFile(fmt.Sprintf("cmd_log_%s.log", p.name), os.O_CREATE, os.ModeAppend)
+
+	for {
+		tmp := make([]byte, 1024)
+		_, err := p.execPipe.Read(tmp)
+		fileData.Write(tmp)
+		if err != nil {
+			break
+		}
+	}
+}
 func (p *Plugin) CreateProcess() error {
 	if p.manager == nil {
 		return yaperror.Error(yaperror.MANAGER_NOT_FOUND, nil)
@@ -303,11 +317,11 @@ func (p *Plugin) CreateProcess() error {
 	cmdArgs := append(server, token...)
 	cmdArgs = append(cmdArgs, register...)
 	p.exec = exec.Command(itemPath, cmdArgs...)
-	p.addr = p.socket
-	p.exec.Stdout = &p.execOut
-	p.exec.Stderr = &p.execErr
-	err = p.exec.Start()
 
+	p.addr = p.socket
+	p.execPipe, _ = p.exec.StdoutPipe()
+	err = p.exec.Start()
+	go p.loggerCmd()
 	if err != nil {
 		return yaperror.Error(yaperror.RUN_BINARY, err, yaperror.WithExra(map[string]interface{}{
 			"output": p.execOut.String(),
