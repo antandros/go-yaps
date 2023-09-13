@@ -14,6 +14,7 @@ import (
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/keepalive"
 )
 
 type Client struct {
@@ -56,7 +57,13 @@ func (c *Client) Connect() error {
 			return net.Dial("unix", addr)
 		}
 		dd := grpc.WithContextDialer(dialer)
-		c.conn, err = grpc.Dial(addr, dd, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		var kacp = keepalive.ClientParameters{
+			Time:                4 * time.Second, // send pings every 4 seconds if there is no activity
+			Timeout:             time.Second,     // wait 1 second for ping ack before considering the connection dead
+			PermitWithoutStream: true,            // send pings even without active streams
+		}
+
+		c.conn, err = grpc.Dial(addr, dd, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithKeepaliveParams(kacp))
 		if err != nil {
 			return err
 		}
