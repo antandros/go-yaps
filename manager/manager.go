@@ -88,7 +88,7 @@ func (pm *PluginManager) StructCall(fu string, str string, ins []*protocol.InTyp
 		for _, d := range resp {
 			respData = append(respData, d.Interface())
 		}
-		pm.logger.Info("response", zap.Any("data", respData))
+		pm.logger.Info("response success")
 		return respData
 	}
 	return resp[0].Interface()

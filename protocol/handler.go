@@ -2,8 +2,6 @@ package protocol
 
 import (
 	"context"
-	"fmt"
-	"reflect"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/stats"
@@ -14,8 +12,8 @@ type Handler struct {
 }
 
 func (h *Handler) TagRPC(c context.Context, t *stats.RPCTagInfo) context.Context {
-	//h.logger.Info("TagRPC", zap.Any("t", t))
-	fmt.Println("tag rpc", t.FullMethodName, t.FailFast)
+	h.logger.Info("TagRPC", zap.Any("t", t), zap.String("function", t.FullMethodName))
+	//fmt.Println("tag rpc", t.FullMethodName, t.FailFast)
 
 	return c
 }
@@ -27,20 +25,18 @@ func (h *Handler) HandleRPC(c context.Context, hg stats.RPCStats) {
 
 func (h *Handler) TagConn(c context.Context, s *stats.ConnTagInfo) context.Context {
 
-	//h.logger.Info("Tag Conn", zap.Any("s", s))
-	fmt.Println("tag con", s.LocalAddr.String(), s.RemoteAddr.String())
+	h.logger.Info("Tag Conn", zap.Any("s", s), zap.String("remote_addr", s.RemoteAddr.String()))
+
 	return c
 }
 
 // HandleConn processes the Conn stats.
 func (h *Handler) HandleConn(c context.Context, s stats.ConnStats) {
-	h.logger.Info("CONN  con", zap.Any("stat", s))
-	fmt.Println("CONN", s, reflect.TypeOf(s).Elem().Name())
 	switch s.(type) {
 	case *stats.ConnEnd:
-		fmt.Println("client  disconnected", s.IsClient())
 		h.logger.Info("client  disconnected", zap.Any("stat", s))
-
+	case *stats.ConnBegin:
+		h.logger.Info("client  connection begin", zap.Any("stat", s))
 	}
 }
 
