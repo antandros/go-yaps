@@ -33,8 +33,9 @@ func (c *Client) WaitConnect() {
 		if state == connectivity.Ready {
 			return
 		}
+		fmt.Println(state)
 		state = c.conn.GetState()
-		time.Sleep(time.Millisecond * 100)
+		<-time.After(time.Millisecond * 100)
 	}
 }
 func (c *Client) ConnectionStatus() connectivity.State {
