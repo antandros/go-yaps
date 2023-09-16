@@ -351,6 +351,7 @@ func (p *Plugin) CreateClient() error {
 	return nil
 }
 func (p *Plugin) ConnectClient() {
+	fmt.Println(p.addr, p.isRemote)
 	p.client = protocol.NewClient(p.addr, p.isRemote, context.Background(), p.GetLogger())
 	err := p.client.Connect()
 	if err != nil {
