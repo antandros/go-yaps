@@ -334,6 +334,11 @@ func (p *Plugin) CreateProcess() error {
 
 	return nil
 }
+func (p *Plugin) CreateRemoteClient() error {
+	go p.ConnectClient()
+
+	return nil
+}
 func (p *Plugin) CreateClient() error {
 	err := p.CreateProcess()
 	if err != nil {

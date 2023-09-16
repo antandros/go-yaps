@@ -16,7 +16,7 @@ import (
 
 func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 	var plg Plugin
-	if !pconfig.Binary {
+	if !pconfig.Binary && !pconfig.RemotePlugin {
 		plg = Plugin{
 			name:     pconfig.Impl.Name(),
 			plg:      pconfig.Impl,
@@ -28,6 +28,7 @@ func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 		}
 		plg.ParseStruct()
 	} else {
+
 		for i := range pm.Plugins {
 			plugn := pm.Plugins[i]
 			if strings.EqualFold(plugn.Name(), pconfig.Name) {
@@ -45,10 +46,15 @@ func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 			isRemote: pconfig.RemotePlugin,
 		}
 		plg.SetManager(pm)
-		err := plg.CreateClient()
-		if err != nil {
-			panic(err)
+		if plg.isRemote {
+			plg.CreateRemoteClient()
+		} else {
+			err := plg.CreateClient()
+			if err != nil {
+				panic(err)
+			}
 		}
+
 		for {
 			if strings.EqualFold(plg.ClientStatus(), "ready") {
 				break
