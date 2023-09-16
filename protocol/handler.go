@@ -15,6 +15,8 @@ type Handler struct {
 
 func (h *Handler) TagRPC(c context.Context, t *stats.RPCTagInfo) context.Context {
 	//h.logger.Info("TagRPC", zap.Any("t", t))
+	fmt.Println("tag rpc", t.FullMethodName, t.FailFast)
+
 	return c
 }
 
@@ -26,6 +28,7 @@ func (h *Handler) HandleRPC(c context.Context, hg stats.RPCStats) {
 func (h *Handler) TagConn(c context.Context, s *stats.ConnTagInfo) context.Context {
 
 	//h.logger.Info("Tag Conn", zap.Any("s", s))
+	fmt.Println("tag con", s.LocalAddr.String(), s.RemoteAddr.String())
 	return c
 }
 
@@ -35,7 +38,7 @@ func (h *Handler) HandleConn(c context.Context, s stats.ConnStats) {
 	fmt.Println("CONN", s, reflect.TypeOf(s).Elem().Name())
 	switch s.(type) {
 	case *stats.ConnEnd:
-
+		fmt.Println("client  disconnected", s.IsClient())
 		h.logger.Info("client  disconnected", zap.Any("stat", s))
 
 	}
