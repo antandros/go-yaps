@@ -44,6 +44,7 @@ func (c *Client) ConnectionStatus() connectivity.State {
 
 }
 func (c *Client) Disconnect() error {
+	fmt.Println("call disconnect")
 	return c.conn.Close()
 }
 func (c *Client) Connect() error {
@@ -59,18 +60,20 @@ func (c *Client) Connect() error {
 		}
 		dd := grpc.WithContextDialer(dialer)
 		var kacp = keepalive.ClientParameters{
-			Time:                4 * time.Second, // send pings every 4 seconds if there is no activity
-			Timeout:             time.Second,     // wait 1 second for ping ack before considering the connection dead
-			PermitWithoutStream: true,            // send pings even without active streams
+			Time:                4 * time.Second,  // send pings every 4 seconds if there is no activity
+			Timeout:             time.Second * 10, // wait 1 second for ping ack before considering the connection dead
+			PermitWithoutStream: true,             // send pings even without active streams
 		}
 
 		c.conn, err = grpc.Dial(addr, dd, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithKeepaliveParams(kacp))
 		if err != nil {
+			fmt.Println(err)
 			return err
 		}
 
 		c.client = NewPluginProtocolClient(c.conn)
 	}
+
 	c.conn.Connect()
 	return nil
 }
@@ -101,6 +104,7 @@ func (ii *InItem) Populate() *InTypes {
 func (cl *Client) GetConfig() ([]byte, error) {
 	req := &Empty{}
 	t := time.Now()
+
 	resp, err := cl.client.RequestConfig(cl.ctx, req)
 	if err != nil {
 		return nil, err
