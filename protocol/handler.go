@@ -3,6 +3,7 @@ package protocol
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/stats"
@@ -19,7 +20,6 @@ func (h *Handler) TagRPC(c context.Context, t *stats.RPCTagInfo) context.Context
 
 // HandleRPC processes the RPC stats.
 func (h *Handler) HandleRPC(c context.Context, hg stats.RPCStats) {
-	fmt.Println("handle", hg)
 	//h.logger.Info("HandleRPC", zap.Any("hand", hg))
 }
 
@@ -32,7 +32,7 @@ func (h *Handler) TagConn(c context.Context, s *stats.ConnTagInfo) context.Conte
 // HandleConn processes the Conn stats.
 func (h *Handler) HandleConn(c context.Context, s stats.ConnStats) {
 	h.logger.Info("CONN  con", zap.Any("stat", s))
-	fmt.Println("CONN", s)
+	fmt.Println("CONN", s, reflect.TypeOf(s).Elem().Name())
 	switch s.(type) {
 	case *stats.ConnEnd:
 
