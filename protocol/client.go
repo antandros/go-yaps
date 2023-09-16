@@ -60,9 +60,9 @@ func (c *Client) Connect() error {
 		}
 		dd := grpc.WithContextDialer(dialer)
 		var kacp = keepalive.ClientParameters{
-			Time:                4 * time.Second,  // send pings every 4 seconds if there is no activity
-			Timeout:             time.Second * 10, // wait 1 second for ping ack before considering the connection dead
-			PermitWithoutStream: true,             // send pings even without active streams
+			Time:                4 * time.Second, // send pings every 4 seconds if there is no activity
+			Timeout:             time.Second * 2, // wait 2 second for ping ack before considering the connection dead
+			PermitWithoutStream: true,            // send pings even without active streams
 		}
 
 		c.conn, err = grpc.Dial(addr, dd, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithKeepaliveParams(kacp))
