@@ -45,8 +45,12 @@ func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 			port:     pconfig.Port,
 			isRemote: pconfig.RemotePlugin,
 		}
+
 		plg.SetManager(pm)
 		if plg.isRemote {
+			if plg.isRemote {
+				plg.addr = fmt.Sprintf("%s:%d", plg.addr, plg.port)
+			}
 			plg.CreateRemoteClient()
 		} else {
 			err := plg.CreateClient()
