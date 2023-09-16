@@ -59,6 +59,7 @@ func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 			if strings.EqualFold(plg.ClientStatus(), "ready") {
 				break
 			}
+			fmt.Println(plg.ClientStatus(), pconfig.Name)
 			time.Sleep(100 * time.Millisecond)
 		}
 
