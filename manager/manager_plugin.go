@@ -352,7 +352,6 @@ func (p *Plugin) CreateClient() error {
 	return nil
 }
 func (p *Plugin) ConnectClient() {
-	fmt.Println(p.addr, p.isRemote)
 	p.client = protocol.NewClient(p.addr, p.isRemote, context.Background(), p.GetLogger())
 	err := p.client.Connect()
 	if err != nil {
@@ -394,7 +393,6 @@ func (p *Plugin) Serve() error {
 	p.logger = p.manager.GetPluginLogger(p.name)
 
 	var err error
-	fmt.Println("p.socket", p.socket)
 	p.socket = p.Socket()
 	var uri string
 	var lType string
