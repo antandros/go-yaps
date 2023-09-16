@@ -246,8 +246,12 @@ func NewTestItem() *TestItem {
 		panic(err)
 	}
 	mng.RegisterPlugin(&manager.PluginConfig{
-		Name:   "Test",
-		Binary: true,
+		Name:         "Test",
+		Binary:       false,
+		RemotePlugin: true,
+		Addr:         "localhost",
+		Port:         50051,
+		NoValidate:   true,
 	})
 	plgItem := &TestItem{
 		TestItemLogger: mng.GetPluginLogger("Test"),

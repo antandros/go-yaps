@@ -38,12 +38,13 @@ func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 		}
 
 		plg = Plugin{
-			name:     pconfig.Name,
-			socket:   pconfig.File,
-			bin:      pconfig.Binary,
-			addr:     pconfig.Addr,
-			port:     pconfig.Port,
-			isRemote: pconfig.RemotePlugin,
+			name:       pconfig.Name,
+			socket:     pconfig.File,
+			bin:        pconfig.Binary,
+			addr:       pconfig.Addr,
+			port:       pconfig.Port,
+			noValidate: pconfig.NoValidate,
+			isRemote:   pconfig.RemotePlugin,
 		}
 
 		plg.SetManager(pm)
@@ -63,7 +64,6 @@ func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 			if strings.EqualFold(plg.ClientStatus(), "ready") {
 				break
 			}
-			fmt.Println(plg.ClientStatus(), pconfig.Name)
 			time.Sleep(100 * time.Millisecond)
 		}
 

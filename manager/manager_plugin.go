@@ -32,6 +32,7 @@ type Plugin struct {
 	token          string
 	port           int64
 	isRemote       bool
+	noValidate     bool
 	bin            bool
 	configResponse bool
 
@@ -65,7 +66,7 @@ func (p *Plugin) SetManager(manager *PluginManager) {
 func (p *Plugin) Call(structName string, function string, args []interface{}) (interface{}, error) {
 
 	isError, err := p.ValidateFunction(structName, function, args)
-	if !isError {
+	if !isError && !p.noValidate {
 		p.GetLogger().Error("Validation error function", zap.Error(err), zap.Any("err_data", err), zap.String("struct", structName), zap.Any("args", args), zap.String("function", function))
 		return []interface{}{}, err
 	}
@@ -447,6 +448,7 @@ type PluginConfig struct {
 	Name         string
 	RemotePlugin bool
 	IsPlugin     bool
+	NoValidate   bool
 	Addr         string
 	Port         int64
 	Impl         PluginInterface

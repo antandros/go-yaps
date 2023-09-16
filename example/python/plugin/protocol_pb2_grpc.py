@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import protocol_pb2 as protocol__pb2
+import plugin.protocol_pb2 as protocol__pb2
 
 
 class PluginProtocolStub(object):
