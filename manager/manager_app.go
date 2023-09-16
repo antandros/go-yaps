@@ -16,7 +16,7 @@ import (
 
 func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 	var plg Plugin
-	if !pconfig.Binary && !pconfig.RemotePlugin {
+	if pconfig.IsPlugin {
 		plg = Plugin{
 			name:     pconfig.Impl.Name(),
 			plg:      pconfig.Impl,

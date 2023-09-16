@@ -34,6 +34,7 @@ func RegisterPlugin(plg manager.PluginInterface, cnf *manager.PluginManagerConfi
 	pmanager.RunPlugin(&manager.PluginConfig{
 		Language:     manager.Go,
 		Impl:         plg,
+		IsPlugin:     true,
 		RemotePlugin: remoteAddress != "",
 		Addr:         remoteAddress,
 		Port:         remotePort,

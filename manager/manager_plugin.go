@@ -445,6 +445,7 @@ type PluginConfig struct {
 	File         string
 	Name         string
 	RemotePlugin bool
+	IsPlugin     bool
 	Addr         string
 	Port         int64
 	Impl         PluginInterface
