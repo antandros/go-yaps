@@ -43,7 +43,7 @@ func (c *Client) ConnectionStatus() connectivity.State {
 
 }
 func (c *Client) Disconnect() error {
-	fmt.Println("call disconnect")
+
 	return c.conn.Close()
 }
 func (c *Client) Connect() error {

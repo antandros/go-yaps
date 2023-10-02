@@ -35,6 +35,7 @@ type Plugin struct {
 	noValidate     bool
 	bin            bool
 	configResponse bool
+	connecting     bool
 
 	language   Language
 	execOut    bytes.Buffer
@@ -225,27 +226,40 @@ func (p *Plugin) ValidateFunction(structName string, function string, args []int
 		"callStruct": structName,
 	}))
 }
+func (p *Plugin) Connecting() bool {
+	return p.connecting
+}
 func (p *Plugin) Connected() bool {
 	if p.client == nil {
+		return false
+	}
+	if p.configResponse == false {
 		return false
 	}
 	return p.client.ConnectionStatus() == connectivity.Ready
 }
 func (p *Plugin) Reconnect() error {
 	err := p.client.Disconnect()
+
 	err = yaperror.Error(yaperror.DISCONNECT_CLIENT, err, yaperror.WithExra(map[string]interface{}{
 		"plugin": p.name,
 	}))
+	if p.exec != nil {
 
-	err = p.exec.Process.Kill()
+		p.exec.Process.Kill()
+		p.process.Kill()
+
+	}
+	p.exec = nil
 	if err != nil {
 		err = yaperror.Error(yaperror.KILL_ERROR, err, yaperror.WithExra(map[string]interface{}{
 			"plugin": p.name,
 		}))
+
 		p.logger.Error("Reconnect kill", zap.Error(err))
 	}
 
-	p.CreateClient()
+	p.CreateWaitClient()
 	return nil
 
 }
@@ -272,37 +286,45 @@ func (p *Plugin) CreateToken() string {
 	return p.token
 }
 func (p *Plugin) ProcessStatus() {
-	fmt.Println("ERR", p.exec.Err)
-	fmt.Println("ProcessState", p.exec.ProcessState)
-	fmt.Println("Process", p.exec.Process)
-	fmt.Println("Pid", p.exec.Process.Pid)
-	fmt.Println(p.execOut.String())
-	fmt.Println(p.client.ConnectionStatus().String())
-	fmt.Println("=======================")
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
+	if p.exec != nil {
+		fmt.Println("ERR", p.exec.Err)
+		fmt.Println("ERR", p.exec.Args)
+		fmt.Println("ERR", p.exec.SysProcAttr)
+		fmt.Println("ProcessState", p.exec.ProcessState, p.client.ConnectionStatus())
+		fmt.Println("Process", p.exec.Process)
+		fmt.Println("Pid", p.exec.Process.Pid)
+		fmt.Println(p.execOut.String())
+
+		fmt.Println("=======================")
+		fmt.Println()
+		fmt.Println()
+		fmt.Println()
+		fmt.Println()
+	}
 }
 func (p *Plugin) loggerCmd() {
 	flog := helper.LoggerNamed(fmt.Sprintf("cmd_%s", p.name))
 
 	for {
-		tmp := make([]byte, 1024)
-		_, err := p.execPipe.Read(tmp)
-		flog.Info(string(tmp))
-		if err != nil {
-			break
+		if len(p.execOut.Bytes()) > 0 {
+			flog.Info("Output", zap.String("err", string(p.execErr.Bytes())))
 		}
+		if len(p.execErr.Bytes()) > 0 {
+			flog.Error("Output", zap.String("err", string(p.execErr.Bytes())))
+		}
+
 	}
 
 }
 func (p *Plugin) CreateProcess() error {
+	p.connecting = true
 	if p.manager == nil {
 		return yaperror.Error(yaperror.MANAGER_NOT_FOUND, nil)
 	}
+
 	binItems, err := os.ReadDir(p.manager.config.BinaryPath)
 	if err != nil {
+
 		return err
 	}
 	var itemPath string
@@ -314,17 +336,39 @@ func (p *Plugin) CreateProcess() error {
 	if itemPath == "" {
 		return yaperror.Error(yaperror.PLUGIN_BINARY_NOT_FOUND, nil)
 	}
+
 	itemPath = path.Join("./", p.manager.config.BinaryPath, itemPath)
+	pathItem, err := exec.LookPath(itemPath)
+
+	if err != nil {
+		panic(err)
+	}
+	p.socket = ""
 	server := []string{"-server", p.manager.socket}
 	token := []string{"-token", p.CreateToken()}
 	register := []string{"-register", p.Socket()}
 	cmdArgs := append(server, token...)
 	cmdArgs = append(cmdArgs, register...)
-	p.exec = exec.Command(itemPath, cmdArgs...)
-
+	p.exec = nil
+	p.exec = exec.Command(pathItem, cmdArgs...)
+	p.exec.Env = os.Environ()
+	p.exec.Stdout = &p.execOut
+	p.exec.Stderr = &p.execErr
 	p.addr = p.socket
 	p.execPipe, _ = p.exec.StdoutPipe()
+
 	err = p.exec.Start()
+	go func() {
+		err := p.exec.Wait()
+		if err != nil {
+			fmt.Println("Process exited err", err)
+		} else {
+			fmt.Println("Process exited")
+		}
+
+		p.exec = nil
+	}()
+
 	go p.loggerCmd()
 	if err != nil {
 		return yaperror.Error(yaperror.RUN_BINARY, err, yaperror.WithExra(map[string]interface{}{
@@ -343,30 +387,47 @@ func (p *Plugin) CreateRemoteClient() error {
 }
 func (p *Plugin) CreateClient() error {
 	err := p.CreateProcess()
+
 	if err != nil {
 		return err
 	}
-	time.Sleep(time.Second)
+	//time.Sleep(time.Second)
 
 	go p.ConnectClient()
 
 	return nil
 }
+func (p *Plugin) CreateWaitClient() error {
+
+	err := p.CreateProcess()
+	if err != nil {
+		return err
+	}
+	<-time.After(time.Second)
+
+	p.ConnectClient()
+	return nil
+}
 func (p *Plugin) ConnectClient() {
+	p.configResponse = false
 	p.client = protocol.NewClient(p.addr, p.isRemote, context.Background(), p.GetLogger())
 	err := p.client.Connect()
+
 	if err != nil {
 		panic(err)
 	}
 	p.client.WaitConnect()
+
 	data, err := p.client.GetConfig()
 	if err != nil {
 
 		fmt.Println("error", err)
 	}
+
 	p.configResponse = true
 	var intf map[string]interface{}
 	json.Unmarshal(data, &intf)
+	p.connecting = false
 	p.StructMap = intf
 }
 func (p *Plugin) ParseStruct() {
