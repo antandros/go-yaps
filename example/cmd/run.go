@@ -28,9 +28,11 @@ func main() {
 	item.AddSlice("test 3")
 	item.AddSlice("test 4")
 	item.AddSlice("test 5")
-
-	<-time.After(time.Second)
-	items, err = item.GetSlice()
-	fmt.Println(items, err)
+	for {
+		fmt.Println(time.Now().Format(time.RFC1123))
+		items, err = item.GetSlice()
+		fmt.Println(items, err)
+		<-time.After(time.Second * 5)
+	}
 
 }

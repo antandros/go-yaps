@@ -238,13 +238,14 @@ func (p *Plugin) Reconnect() error {
 	}))
 
 	err = p.exec.Process.Kill()
-	err = yaperror.Error(yaperror.KILL_ERROR, err, yaperror.WithExra(map[string]interface{}{
-		"plugin": p.name,
-	}))
+	if err != nil {
+		err = yaperror.Error(yaperror.KILL_ERROR, err, yaperror.WithExra(map[string]interface{}{
+			"plugin": p.name,
+		}))
+		p.logger.Error("Reconnect kill", zap.Error(err))
+	}
 
-	p.logger.Error("Reconnect kill", zap.Error(err))
 	p.CreateClient()
-	p.client.WaitConnect()
 	return nil
 
 }
