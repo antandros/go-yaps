@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/antandros/go-yaps/helper"
 	"github.com/antandros/go-yaps/parser"
 	"github.com/antandros/go-yaps/protocol"
 	"github.com/antandros/go-yaps/yaperror"
@@ -303,17 +302,6 @@ func (p *Plugin) ProcessStatus() {
 	}
 }
 func (p *Plugin) loggerCmd() {
-	flog := helper.LoggerNamed(fmt.Sprintf("cmd_%s", p.name))
-
-	for {
-		if len(p.execOut.Bytes()) > 0 {
-			flog.Info("Output", zap.String("err", string(p.execErr.Bytes())))
-		}
-		if len(p.execErr.Bytes()) > 0 {
-			flog.Error("Output", zap.String("err", string(p.execErr.Bytes())))
-		}
-
-	}
 
 }
 func (p *Plugin) CreateProcess() error {
@@ -375,6 +363,9 @@ func (p *Plugin) CreateProcess() error {
 			"output": p.execOut.String(),
 			"err":    p.execErr.String(),
 		}))
+	}
+	if p.exec == nil {
+		return p.CreateProcess()
 	}
 	p.process = p.exec.Process
 

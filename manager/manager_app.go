@@ -56,7 +56,7 @@ func (pm *PluginManager) registerPlugin(pconfig *PluginConfig) *Plugin {
 		} else {
 			err := plg.CreateClient()
 			if err != nil {
-				panic(err)
+				fmt.Println(err)
 			}
 		}
 
@@ -85,7 +85,7 @@ func RegisterManager(cnf *PluginManagerConfig) *PluginManager {
 
 	pth, err := os.MkdirTemp("", "pluginManager")
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 	var manId string
 	if cnf != nil {
@@ -106,7 +106,7 @@ func RegisterManager(cnf *PluginManagerConfig) *PluginManager {
 	if pthErr != nil {
 		errMk := os.MkdirAll(pthLog, 0700)
 		if errMk != nil {
-			panic(errMk)
+			fmt.Println(errMk)
 		}
 	}
 
