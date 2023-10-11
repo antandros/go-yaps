@@ -346,19 +346,9 @@ func (p *Plugin) CreateProcess() error {
 	p.execPipe, _ = p.exec.StdoutPipe()
 
 	err = p.exec.Start()
-	go func() {
-		err := p.exec.Wait()
-		if err != nil {
-			fmt.Println("Process exited err", err)
-		} else {
-			fmt.Println("Process exited")
-		}
 
-		p.exec = nil
-	}()
-
-	go p.loggerCmd()
 	if err != nil {
+
 		return yaperror.Error(yaperror.RUN_BINARY, err, yaperror.WithExra(map[string]interface{}{
 			"output": p.execOut.String(),
 			"err":    p.execErr.String(),
@@ -367,6 +357,21 @@ func (p *Plugin) CreateProcess() error {
 	if p.exec == nil {
 		return p.CreateProcess()
 	}
+	go p.loggerCmd()
+	go func() {
+		if p.exec != nil {
+
+			err := p.exec.Wait()
+			if err != nil {
+				fmt.Println("Process exited err", err)
+			} else {
+				fmt.Println("Process exited")
+			}
+		}
+
+		p.exec = nil
+	}()
+
 	p.process = p.exec.Process
 
 	return nil
